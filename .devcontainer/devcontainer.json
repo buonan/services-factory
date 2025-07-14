@@ -1,0 +1,19 @@
+{
+    "name": "Local Devcontainer",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "remoteUser": "ubuntu",
+    "features": {
+    },
+    "workspaceFolder": "/workspace",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "llvm-vs-code-extensions.vscode-clangd"
+                // Add other extensions here if needed
+            ]
+        }
+    }
+}
