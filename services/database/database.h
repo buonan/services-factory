@@ -24,6 +24,10 @@ class DatabaseService : public IService {
         return true;
     }
 
+    bool health() override { 
+        return m_running && m_connected; 
+    }
+
     bool start() override {
         std::cout << "DatabaseService: Starting..." << std::endl;
         m_connected = true;

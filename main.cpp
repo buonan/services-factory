@@ -1,6 +1,7 @@
 #include "framework/service_factory.h"
 #include "framework/service_manager.h"
 #include "services/examples/example_services.h"
+#include "services/logging/logging_service.h"
 #include <chrono>
 #include <iostream>
 #include <thread>

@@ -1,0 +1,81 @@
+{
+    // Bazel configuration
+    "bazel.buildifierFixOnFormat": true,
+    "bazel.queriesShareServer": true,
+    "bazel.executable": "/usr/bin/bazel",
+    
+    // C++ configuration
+    "C_Cpp.default.configurationProvider": "ms-vscode.cpptools",
+    "C_Cpp.default.cppStandard": "c++17",
+    "C_Cpp.default.intelliSenseMode": "gcc-x64",
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/**"
+    ],
+    "C_Cpp.default.defines": [],
+    "C_Cpp.default.compilerPath": "/usr/bin/g++",
+    
+    // File associations
+    "files.associations": {
+        "BUILD": "python",
+        "*.BUILD": "python",
+        "WORKSPACE": "python",
+        "*.bzl": "python",
+        "*.h": "cpp",
+        "*.hpp": "cpp",
+        "*.cpp": "cpp",
+        "*.cc": "cpp"
+    },
+    
+    // Editor configuration
+    "editor.formatOnSave": true,
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": true,
+    
+    // Terminal configuration
+    "terminal.integrated.defaultProfile.linux": "zsh",
+    "terminal.integrated.profiles.linux": {
+        "zsh": {
+            "path": "/usr/bin/zsh",
+            "args": ["-l"]
+        },
+        "bash": {
+            "path": "/usr/bin/bash",
+            "args": ["-l"]
+        }
+    },
+    
+    // Search configuration
+    "search.exclude": {
+        "**/bazel-*": true,
+        "**/build": true,
+        "**/.git": true,
+        "**/node_modules": true
+    },
+    
+    // File watcher configuration
+    "files.watcherExclude": {
+        "**/bazel-*/**": true,
+        "**/build/**": true
+    },
+    
+    // CMake configuration
+    "cmake.buildDirectory": "${workspaceFolder}/build",
+    "cmake.configureOnOpen": false,
+    
+    // Makefile configuration
+    "makefile.configureOnOpen": false,
+    
+    // Git configuration
+    "git.ignoreLimitWarning": true,
+    
+    // Spell checker configuration
+    "cSpell.words": [
+        "bazel",
+        "buildifier",
+        "clangd",
+        "devcontainer",
+        "gtest",
+        "pthread"
+    ]
+}

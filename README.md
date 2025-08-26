@@ -11,6 +11,7 @@ A flexible and extensible C++ framework for managing services using the Factory 
 - **Thread-Safe Operations**: Safe for multi-threaded environments
 - **Extensible Design**: Easy to add new service types
 - **Modern C++17**: Uses modern C++ features and best practices
+- **REST API Service**: Built-in HTTP REST API for service management
 
 ## Architecture
 
@@ -20,7 +21,7 @@ The framework consists of several key components:
 
 1. **IService Interface** (`service_interface.h`)
    - Base interface that all services must implement
-   - Defines lifecycle methods: `initialize()`, `start()`, `stop()`
+   - Defines lifecycle methods: `initialize()`, `start()`, `stop()`, `health()`
    - Provides service identification and status methods
 
 2. **ServiceFactory** (`service_factory.h`, `service_factory.cpp`)
@@ -33,11 +34,37 @@ The framework consists of several key components:
    - Handles service lifecycle orchestration
    - Maintains service dependencies and order
 
-4. **Example Services** (`example_services.h`)
+4. **REST API Service** (`services/rest_api/`)
+   - HTTP REST API for service management
+   - Built-in endpoints for service control
+   - Support for custom routes and handlers
+   - Multi-threaded request processing
+
+5. **Example Services** (`services/`)
    - Demonstrates framework usage with concrete implementations
-   - Includes LoggingService, DatabaseService, NetworkService, and CacheService
+   - Includes LoggingService, DatabaseService, CacheService, and more
 
 ## Quick Start
+
+### Development Environment
+
+#### Using Dev Container (Recommended for development)
+The easiest way to get started is using the provided dev container with VS Code:
+
+1. **Prerequisites**: Install VS Code and the Dev Containers extension
+2. **Open Project**: Open the project folder in VS Code
+3. **Reopen in Container**: Use Command Palette (Ctrl+Shift+P) → "Dev Containers: Reopen in Container"
+4. **Wait for Setup**: The container will automatically install Bazel, Make, CMake, and all dependencies
+5. **Start Building**: Use the provided aliases or VS Code tasks
+
+The dev container includes:
+- ✅ Bazel 8.x with completion and VS Code integration
+- ✅ Make and CMake build systems
+- ✅ C++17 compiler and debugging tools
+- ✅ Pre-configured VS Code extensions and tasks
+- ✅ Shell aliases for common commands
+
+See [.devcontainer/README.md](.devcontainer/README.md) for detailed setup and usage instructions.
 
 ### Building the Project
 
@@ -46,8 +73,14 @@ The framework consists of several key components:
 # Build everything
 make all
 
-# Build and run demo
+# Build and run main demo
 make run-demo
+
+# Build and run REST API server
+make run-rest-api
+
+# Build and run REST API test client
+make run-test-client
 
 # Build and run tests
 make run-test
@@ -59,18 +92,52 @@ make lib
 make clean
 ```
 
+#### Using Bazel (Recommended for large projects)
+```bash
+# Build everything
+bazel build //...
+
+# Build and run main demo
+bazel run //:service_framework_demo
+
+# Build and run REST API server
+bazel run //:rest_api_demo
+
+# Build and run REST API test client (in another terminal)
+bazel run //:rest_api_test_client
+
+# Build and run weather service demo
+bazel run //services/weather:weather_main
+
+# Run tests
+bazel test //framework:framework_test
+
+# Build specific components
+bazel build //framework:framework_core
+bazel build //services:all_services
+
+# Use convenience script
+./build_bazel.sh
+```
+
 #### Using CMake
 ```bash
 mkdir build && cd build
 cmake ..
 make
+
+# Run REST API demo
+./RestApiDemo
+
+# Run test client (in another terminal)
+./RestApiTestClient
 ```
 
 ### Basic Usage
 
 ```cpp
 #include "service_manager.h"
-#include "example_services.h"
+#include "services/logging/logging_service.h"
 
 using namespace ServiceFramework;
 
@@ -98,6 +165,80 @@ int main() {
 }
 ```
 
+### REST API Usage
+
+```cpp
+#include "services/rest_api/rest_api_service.h"
+#include "services/rest_api/rest_api_registration.h"
+
+int main() {
+    ServiceManager manager;
+    
+    // Add services including REST API
+    manager.addService("LoggingService", "logger");
+    manager.addService("RestApiService", "api_server");
+    
+    // Configure REST API
+    auto* apiService = dynamic_cast<RestApiService*>(manager.getService("api_server"));
+    if (apiService) {
+        apiService->setServiceManager(&manager);
+        apiService->setPort(8080);
+        
+        // Add custom route
+        apiService->addRoute("GET", "/api/custom/hello", [](const HttpRequest& req) {
+            HttpResponse response;
+            response.body = R"({"message": "Hello World!"})";
+            return response;
+        });
+    }
+    
+    manager.initializeAll();
+    manager.startAll();
+    
+    // REST API server is now running on http://localhost:8080
+    // Available endpoints:
+    // GET /api/services - List all services
+    // GET /api/services/{name} - Get service info
+    // GET /api/health/{name} - Check service health
+    // POST /api/services/{name}/start - Start service
+    // POST /api/services/{name}/stop - Stop service
+    
+    return 0;
+}
+```
+
+## REST API Endpoints
+
+The REST API service provides the following built-in endpoints:
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/services` | List all services |
+| GET | `/api/services/{name}` | Get service information |
+| GET | `/api/health/{name}` | Check service health |
+| POST | `/api/services/{name}/start` | Start a service |
+| POST | `/api/services/{name}/stop` | Stop a service |
+| GET | `/api/status` | Get API server status |
+
+### Example API Calls
+
+```bash
+# List all services
+curl http://localhost:8080/api/services
+
+# Get specific service info
+curl http://localhost:8080/api/services/logger
+
+# Check service health
+curl http://localhost:8080/api/health/logger
+
+# Start a service
+curl -X POST http://localhost:8080/api/services/logger/start
+
+# Stop a service
+curl -X POST http://localhost:8080/api/services/logger/stop
+```
+
 ## Creating Custom Services
 
 ### Step 1: Implement the IService Interface
@@ -111,6 +252,10 @@ public:
         // Initialize your service
         std::cout << "MyCustomService: Initializing..." << std::endl;
         return true;
+    }
+    
+    bool health() override {
+        return m_running;
     }
     
     bool start() override {
@@ -188,6 +333,31 @@ auto* primaryDb = dynamic_cast<DatabaseService*>(manager.getService("primary_db"
 auto* secondaryDb = dynamic_cast<DatabaseService*>(manager.getService("secondary_db"));
 ```
 
+### Custom REST API Routes
+
+```cpp
+auto* apiService = dynamic_cast<RestApiService*>(manager.getService("api_server"));
+if (apiService) {
+    // Add parameterized route
+    apiService->addRoute("GET", "/api/users/{id}", [](const HttpRequest& req) {
+        HttpResponse response;
+        auto idIt = req.pathParams.find("id");
+        if (idIt != req.pathParams.end()) {
+            response.body = R"({"user_id": ")" + idIt->second + R"("})";
+        }
+        return response;
+    });
+    
+    // Add POST endpoint with body processing
+    apiService->addRoute("POST", "/api/data", [](const HttpRequest& req) {
+        HttpResponse response;
+        // Process req.body
+        response.body = R"({"received": ")" + req.body + R"("})";
+        return response;
+    });
+}
+```
+
 ### Manual Service Creation
 
 ```cpp
@@ -235,21 +405,23 @@ The framework includes several example services to demonstrate usage:
 - Connection management
 - Query execution interface
 
-### NetworkService
-- Network server simulation
-- Configurable port settings
-- Connection handling
-
 ### CacheService
 - In-memory key-value cache
 - Thread-safe operations
 - Configurable cache policies
+
+### RestApiService
+- HTTP REST API server
+- Service management endpoints
+- Custom route support
+- Multi-threaded request handling
 
 ## Thread Safety
 
 The framework is designed to be thread-safe:
 - ServiceFactory uses singleton pattern with thread-safe initialization
 - ServiceManager operations are protected for concurrent access
+- RestApiService uses thread pool for concurrent request handling
 - Individual services should implement their own thread safety as needed
 
 ## Best Practices
@@ -260,13 +432,20 @@ The framework is designed to be thread-safe:
 4. **Thread Safety**: Implement appropriate synchronization in custom services
 5. **Service Naming**: Use descriptive names for service instances
 6. **Lifecycle Management**: Follow the initialize → start → stop → cleanup pattern
+7. **Health Checks**: Implement meaningful health checks in your services
+8. **REST API Security**: Add authentication for production REST API usage
 
 ## Testing
 
 Run the included tests to verify framework functionality:
 
 ```bash
+# Test framework
 make run-test
+
+# Test REST API
+make run-rest-api    # In one terminal
+make run-test-client # In another terminal
 ```
 
 The test suite covers:
@@ -275,6 +454,7 @@ The test suite covers:
 - Multiple service instances
 - Error handling scenarios
 - Service lifecycle management
+- REST API endpoints and functionality
 
 ## Contributing
 
@@ -283,6 +463,7 @@ When adding new features:
 2. Add appropriate tests for new functionality
 3. Update documentation and examples
 4. Ensure thread safety where applicable
+5. Add REST API endpoints for new service management features
 
 ## License
 

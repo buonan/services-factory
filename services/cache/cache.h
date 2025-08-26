@@ -22,6 +22,10 @@ class CacheService : public IService {
         return true;
     }
 
+    bool health() override { 
+        return m_running; 
+    }
+
     bool start() override {
         std::cout << "CacheService: Starting cache service..." << std::endl;
         m_running = true;

@@ -181,4 +181,12 @@ void ServiceManager::clear() {
     std::cout << "All services cleared" << std::endl;
 }
 
+std::unordered_map<std::string, IService*> ServiceManager::getAllServices() const {
+    std::unordered_map<std::string, IService*> result;
+    for (const auto& pair : m_services) {
+        result[pair.first] = pair.second->service.get();
+    }
+    return result;
+}
+
 } // namespace ServiceFramework

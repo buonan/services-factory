@@ -1,0 +1,28 @@
+# C++ configuration
+build --cxxopt=-std=c++17
+build --host_cxxopt=-std=c++17
+
+# Compiler flags
+build --cxxopt=-Wall
+build --cxxopt=-Wextra
+build --cxxopt=-Wpedantic
+
+# Debug configuration
+build:debug --cxxopt=-g
+build:debug --cxxopt=-O0
+build:debug --strip=never
+
+# Release configuration
+build:release --cxxopt=-O2
+build:release --cxxopt=-DNDEBUG
+build:release --strip=always
+
+# Test configuration
+test --test_output=errors
+test --test_summary=detailed
+
+# Threading support
+build --linkopt=-lpthread
+
+# Default to optimized builds
+build --config=release

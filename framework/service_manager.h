@@ -95,6 +95,12 @@ class ServiceManager {
      */
     void clear();
 
+    /**
+     * @brief Get all services as a map of instance name to service pointer
+     * @return Map of instance names to service pointers
+     */
+    std::unordered_map<std::string, IService*> getAllServices() const;
+
   private:
     struct ServiceInfo {
         ServicePtr service;

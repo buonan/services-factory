@@ -1,6 +1,6 @@
-#include "../../services/examples/example_services.h"
-#include "../service_factory.h"
-#include "../service_manager.h"
+#include "services/examples/example_services.h"
+#include "framework/service_factory.h"
+#include "framework/service_manager.h"
 #include <cassert>
 #include <iostream>
 

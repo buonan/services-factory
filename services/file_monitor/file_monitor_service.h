@@ -1,6 +1,6 @@
-#include "../../framework/service_factory.h"
-#include "../../framework/service_manager.h"
-#include "../examples/example_services.h"
+#include "framework/service_factory.h"
+#include "framework/service_manager.h"
+#include "services/examples/example_services.h"
 #include <atomic>
 #include <chrono>
 #include <iostream>

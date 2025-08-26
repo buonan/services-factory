@@ -18,6 +18,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 add_library(ServiceFramework STATIC
     ./framework/service_factory.cpp
     ./framework/service_manager.cpp
+    ./services/rest_api/rest_api_service.cpp
 )
 
 target_include_directories(ServiceFramework PUBLIC
@@ -27,12 +28,26 @@ target_include_directories(ServiceFramework PUBLIC
 # Create the main executable
 add_executable(ServiceFrameworkDemo
     ./services/weather/main.cpp
-    # main.cpp
 )
 
 target_link_libraries(ServiceFrameworkDemo
     ServiceFramework
     pthread  # For std::thread support
+)
+
+# Create REST API demo executable
+add_executable(RestApiDemo
+    ./services/rest_api/rest_api_demo.cpp
+)
+
+target_link_libraries(RestApiDemo
+    ServiceFramework
+    pthread
+)
+
+# Create REST API test client
+add_executable(RestApiTestClient
+    ./services/rest_api/test_client.cpp
 )
 
 # Optional: Create a simple test executable
@@ -46,7 +61,7 @@ target_link_libraries(ServiceFrameworkTest
 )
 
 # Installation rules (optional)
-install(TARGETS ServiceFramework ServiceFrameworkDemo
+install(TARGETS ServiceFramework ServiceFrameworkDemo RestApiDemo
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
     RUNTIME DESTINATION bin

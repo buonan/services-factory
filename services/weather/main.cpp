@@ -1,7 +1,7 @@
-#include "../../framework/service_factory.h"
-#include "../../framework/service_manager.h"
-#include "../file_monitor/file_monitor_service.h"
-#include "../logging/logging_service.h"
+#include "framework/service_factory.h"
+#include "framework/service_manager.h"
+#include "services/file_monitor/file_monitor_service.h"
+#include "services/logging/logging_service.h"
 #include "weather_service.h"
 #include <atomic>
 #include <chrono>
@@ -57,23 +57,16 @@ int main() {
         }
 
         // Get the file monitor service
-        // auto* fileMonitor =
-        // dynamic_cast<FileMonitorService*>(manager.getService("file_watcher"));
-        // if (fileMonitor) {
-        //     fileMonitor->addFileToWatch("/tmp/test1.txt");
-        //     fileMonitor->addFileToWatch("/tmp/test2.txt");
-        //     fileMonitor->addFileToWatch("/home/user/important.doc");
+        auto* fileMonitor =
+        dynamic_cast<FileMonitorService*>(manager.getService("file_watcher"));
+        if (fileMonitor) {
+            fileMonitor->addFileToWatch("/tmp/test1.txt");
+            fileMonitor->addFileToWatch("/tmp/test2.txt");
+            fileMonitor->addFileToWatch("/home/user/important.doc");
 
-        //     std::cout << "File Monitor: Watching " <<
-        //     fileMonitor->getWatchedFileCount() << " files" << std::endl;
-        // }
-
-        // // Use the logging service
-        // auto* logger =
-        // dynamic_cast<LoggingService*>(manager.getService("logger")); if
-        // (logger) {
-        //     logger->logMessage("Custom services are working perfectly!");
-        // }
+            std::cout << "File Monitor: Watching " <<
+            fileMonitor->getWatchedFileCount() << " files" << std::endl;
+        }
 
         std::cout << "\n--- Service Information ---" << std::endl;
         std::cout << "Total services running: " << manager.getServiceCount()

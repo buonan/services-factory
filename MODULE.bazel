@@ -1,0 +1,13 @@
+module(
+    name = "services_framework",
+    version = "1.0.0",
+)
+
+# C++ rules
+bazel_dep(name = "rules_cc", version = "0.1.1")
+
+# Google Test for unit testing
+bazel_dep(name = "googletest", version = "1.14.0.bcr.1")
+
+# Abseil C++ library (optional, for additional utilities)
+bazel_dep(name = "abseil-cpp", version = "20240116.2")

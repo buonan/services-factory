@@ -1,19 +1,61 @@
 {
-    "name": "Local Devcontainer",
+    "name": "C++ Services Framework Devcontainer",
     "build": {
         "dockerfile": "Dockerfile"
     },
     "remoteUser": "ubuntu",
     "features": {
+        "ghcr.io/devcontainers/features/common-utils:2": {
+            "installZsh": true,
+            "configureZshAsDefaultShell": true,
+            "installOhMyZsh": true
+        }
     },
     "workspaceFolder": "/workspace",
     "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
     "customizations": {
         "vscode": {
             "extensions": [
-                "llvm-vs-code-extensions.vscode-clangd"
-                // Add other extensions here if needed
-            ]
+                "llvm-vs-code-extensions.vscode-clangd",
+                "BazelBuild.vscode-bazel",
+                "ms-vscode.cpptools",
+                "ms-vscode.cpptools-extension-pack",
+                "ms-vscode.cmake-tools",
+                "twxs.cmake",
+                "ms-vscode.makefile-tools",
+                "streetsidesoftware.code-spell-checker",
+                "ms-vscode.vscode-json",
+                "redhat.vscode-yaml"
+            ],
+            "settings": {
+                "bazel.buildifierFixOnFormat": true,
+                "bazel.queriesShareServer": true,
+                "bazel.executable": "/usr/bin/bazel",
+                "C_Cpp.default.configurationProvider": "ms-vscode.cpptools",
+                "C_Cpp.default.cppStandard": "c++17",
+                "C_Cpp.default.intelliSenseMode": "gcc-x64",
+                "files.associations": {
+                    "BUILD": "python",
+                    "*.BUILD": "python",
+                    "WORKSPACE": "python",
+                    "*.bzl": "python"
+                },
+                "terminal.integrated.defaultProfile.linux": "zsh"
+            }
+        }
+    },
+    "postCreateCommand": ".devcontainer/setup.sh",
+    "mounts": [
+        "source=${localEnv:HOME}/.gitconfig,target=/home/ubuntu/.gitconfig,type=bind,consistency=cached"
+    ],
+    "containerEnv": {
+        "BAZEL_COMPLETION": "true"
+    },
+    "forwardPorts": [8080],
+    "portsAttributes": {
+        "8080": {
+            "label": "REST API Server",
+            "onAutoForward": "notify"
         }
     }
 }
